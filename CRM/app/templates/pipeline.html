@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Modal Styling (Same as leads for consistency) -->
+<style>
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(10, 25, 47, 0.6);
+        z-index: 1001;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s;
+    }
+
+    .modal-content {
+        background: var(--white);
+        padding: 30px;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+        color: var(--navy);
+        font-size: 20px;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-light);
+        transition: color 0.2s;
+    }
+
+    .close-btn:hover {
+        color: #EF4444;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--text-dark);
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #D1D5DB;
+        border-radius: 6px;
+        outline: none;
+        transition: border 0.3s;
+    }
+
+    .form-group input:focus {
+        border-color: var(--green);
+    }
+
+    .submit-btn {
+        background: var(--green);
+        color: white;
+        border: none;
+        padding: 12px;
+        width: 100%;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: background 0.3s;
+    }
+
+    .submit-btn:hover {
+        background: var(--green-hover);
+    }
+</style>
+
+<div
+    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #E5E7EB;">
+    <div>
+        <h1 style="font-size: 28px; color: var(--navy);">Pipeline</h1>
+        <p style="color: var(--text-light); margin-top: 5px;">Drag and drop deals to update their status.</p>
+    </div>
+    <!-- Button to trigger New Deal Modal -->
+    <button onclick="document.getElementById('dealModal').style.display='flex'"
+        style="background: var(--green); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(16,185,129,0.2);"
+        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(16,185,129,0.3)'"
+        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(16,185,129,0.2)'">
+        <i class="fas fa-plus" style="margin-right: 8px;"></i> New Deal
+    </button>
+</div>
+
+<div class="kanban-board" style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; min-height: 60vh;">
+    <!-- Column 1: Lead In -->
+    <div class="kanban-column" ondragover="allowDrop(event)" ondrop="drop(event, 'Lead In')"
+        style="flex: 1; min-width: 300px; background: #F9FAFB; border-radius: 12px; padding: 20px; border: 1px solid #E5E7EB; transition: background 0.3s;">
+        <h3
+            style="color: var(--navy); margin-bottom: 15px; font-size: 16px; padding-bottom: 10px; border-bottom: 2px solid #E5E7EB;">
+            Lead In</h3>
+        {% for deal in deals %}
+        <div class="kanban-card" draggable="true" ondragstart="drag(event)" id="deal_{{ loop.index }}"
+            style="background: white; padding: 15px; border-radius: 8px; box-shadow: var(--shadow); margin-bottom: 15px; cursor: grab; border-left: 4px solid var(--navy); transition: transform 0.2s;"
+            onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+            <h4 style="color: var(--text-dark); margin-bottom: 5px;">{{ deal.name }}</h4>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: var(--green); font-weight: bold; font-size: 14px;">${{ deal.amount }}</span>
+                <i class="fas fa-grip-vertical" style="color: #D1D5DB;"></i>
+            </div>
+        </div>
+        {% else %}
+        <div style="text-align: center; color: var(--text-light); padding: 20px; font-size: 14px;">No active deals.
+        </div>
+        {% endfor %}
+    </div>
+    <!-- Column 2: In Progress -->
+    <div class="kanban-column" ondragover="allowDrop(event)" ondrop="drop(event, 'In Progress')"
+        style="flex: 1; min-width: 300px; background: #F9FAFB; border-radius: 12px; padding: 20px; border: 1px solid #E5E7EB; transition: background 0.3s;">
+        <h3
+            style="color: #F59E0B; margin-bottom: 15px; font-size: 16px; padding-bottom: 10px; border-bottom: 2px solid #E5E7EB;">
+            In Progress</h3>
+    </div>
+    <!-- Column 3: Closed Won -->
+    <div class="kanban-column" ondragover="allowDrop(event)" ondrop="drop(event, 'Closed Won')"
+        style="flex: 1; min-width: 300px; background: rgba(16, 185, 129, 0.05); border-radius: 12px; padding: 20px; border: 1px solid rgba(16, 185, 129, 0.2); transition: background 0.3s;">
+        <h3
+            style="color: var(--green); margin-bottom: 15px; font-size: 16px; padding-bottom: 10px; border-bottom: 2px solid rgba(16, 185, 129, 0.2);">
+            Closed Won</h3>
+    </div>
+</div>
+
+<!-- Add New Deal Pop-up Modal -->
+<div id="dealModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add New Deal</h2>
+            <button class="close-btn" onclick="document.getElementById('dealModal').style.display='none'"><i
+                    class="fas fa-times"></i></button>
+        </div>
+        <form action="/add_deal" method="POST">
+            <div class="form-group">
+                <label>Deal Name / Project Title</label>
+                <input type="text" name="name" placeholder="e.g. E-commerce Website" required>
+            </div>
+            <div class="form-group">
+                <label>Deal Amount ($)</label>
+                <input type="number" name="amount" placeholder="5000" required>
+            </div>
+            <button type="submit" class="submit-btn">Save Deal</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); ev.target.style.opacity = '0.5'; }
+    document.addEventListener('dragend', function (ev) { ev.target.style.opacity = '1'; });
+    function drop(ev, status) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        var column = ev.target.closest('.kanban-column');
+        if (column) { column.appendChild(document.getElementById(data)); }
+    }
+    // Close modal if clicked outside
+    window.onclick = function (event) {
+        var modal = document.getElementById('dealModal');
+        if (event.target == modal) { modal.style.display = "none"; }
+    }
+</script>
+{% endblock %}

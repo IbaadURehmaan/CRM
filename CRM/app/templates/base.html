@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordbitX CRM</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #0A192F;
+            --green: #10B981;
+            --green-hover: #0e9f6e;
+            --bg-color: #F3F4F6;
+            --text-dark: #1F2937;
+            --text-light: #6B7280;
+            --white: #FFFFFF;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            display: flex;
+            min-height: 100vh;
+            color: var(--text-dark);
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 250px;
+            background-color: var(--navy);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            box-shadow: var(--shadow);
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h2 {
+            color: var(--green);
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 20px 0;
+            flex-grow: 1;
+        }
+
+        .nav-links li a {
+            display: flex;
+            align-items: center;
+            padding: 15px 24px;
+            color: #9CA3AF;
+            text-decoration: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links li a i {
+            margin-right: 12px;
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-links li a:hover {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--green);
+            padding-left: 30px;
+        }
+
+        .nav-divider {
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.1);
+            margin: 15px 24px;
+        }
+
+        /* Main Content Styling & Animation */
+        .main-content {
+            flex-grow: 1;
+            margin-left: 250px;
+            padding: 40px;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Top Header */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #E5E7EB;
+        }
+
+        .top-header h1 {
+            font-size: 28px;
+            color: var(--navy);
+        }
+
+        /* Chatbot Widget Styling */
+        .chat-widget {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 350px;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-hover);
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-header {
+            background: var(--navy);
+            color: var(--white);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .chat-header span {
+            color: var(--green);
+        }
+
+        .chat-header button {
+            background: none;
+            border: none;
+            color: var(--white);
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .chat-messages {
+            height: 300px;
+            padding: 15px;
+            overflow-y: auto;
+            background: #F9FAFB;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background: var(--white);
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .chat-input input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #D1D5DB;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .chat-input input:focus {
+            border-color: var(--green);
+        }
+
+        .chat-input button {
+            background: var(--green);
+            color: var(--white);
+            border: none;
+            padding: 10px 15px;
+            margin-left: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .chat-input button:hover {
+            background: var(--green-hover);
+        }
+
+        .chat-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--green);
+            color: var(--white);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 999;
+            transition: transform 0.3s ease;
+        }
+
+        .chat-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .msg {
+            padding: 10px 14px;
+            border-radius: 8px;
+            max-width: 80%;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .msg.user {
+            background: var(--navy);
+            color: var(--white);
+            align-self: flex-end;
+            border-bottom-right-radius: 0;
+        }
+
+        .msg.bot {
+            background: #E5E7EB;
+            color: var(--text-dark);
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>WordbitX</h2>
+            <p style="font-size: 12px; margin-top: 5px; color: #9CA3AF;">CRM Dashboard</p>
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('main.dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="{{ url_for('main.leads') }}"><i class="fas fa-users"></i> Leads</a></li>
+            <li><a href="{{ url_for('main.pipeline') }}"><i class="fas fa-chart-line"></i> Pipeline</a></li>
+            <li><a href="{{ url_for('main.support') }}"><i class="fas fa-headset"></i> Support</a></li>
+
+            <div class="nav-divider"></div>
+
+            <!-- Account Authentication Logic -->
+            {% if session.get('user_id') or session.get('user') %}
+            <!-- Sirf Logout dikhayen jab user login ho -->
+            <li><a href="/logout" style="color: #EF4444;"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            {% else %}
+            <!-- Sirf Login / Sign Up dikhayen jab user login na ho -->
+            <li><a href="{{ url_for('main.login') }}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+            <li><a href="{{ url_for('main.signup') }}"><i class="fas fa-user-plus"></i> Sign Up</a></li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- AI Chatbot Toggle Button -->
+    <div class="chat-toggle" onclick="toggleChat()">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <!-- AI Chatbot Widget -->
+    <div class="chat-widget" id="chatWidget">
+        <div class="chat-header">
+            <div>WordbitX <span>AI Assistant</span></div>
+            <button onclick="toggleChat()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="msg bot">Hello! I am your WordbitX AI. How can I help you today?</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- Chatbot Logic -->
+    <script>
+        function toggleChat() {
+            const chat = document.getElementById('chatWidget');
+            chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') sendMessage();
+        }
+
+        async function sendMessage() {
+            const inputField = document.getElementById('userInput');
+            const message = inputField.value.trim();
+            if (!message) return;
+
+            const chatMessages = document.getElementById('chatMessages');
+
+            // Add user message to UI
+            chatMessages.innerHTML += `<div class="msg user">${message}</div>`;
+            inputField.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            try {
+                // Send request to Flask backend
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+                // Add AI reply to UI
+                chatMessages.innerHTML += `<div class="msg bot">${data.reply}</div>`;
+            } catch (error) {
+                chatMessages.innerHTML += `<div class="msg bot" style="color: red;">Error connecting to AI.</div>`;
+            }
+
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
+</body>
+
+</html>

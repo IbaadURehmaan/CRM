@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Modal Styling -->
+<style>
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(10, 25, 47, 0.6);
+        z-index: 1001;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s;
+    }
+
+    .modal-content {
+        background: var(--white);
+        padding: 30px;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+        color: var(--navy);
+        font-size: 20px;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-light);
+        transition: color 0.2s;
+    }
+
+    .close-btn:hover {
+        color: #EF4444;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--text-dark);
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #D1D5DB;
+        border-radius: 6px;
+        outline: none;
+        transition: border 0.3s;
+    }
+
+    .form-group input:focus {
+        border-color: var(--green);
+    }
+
+    .submit-btn {
+        background: var(--green);
+        color: white;
+        border: none;
+        padding: 12px;
+        width: 100%;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: background 0.3s;
+    }
+
+    .submit-btn:hover {
+        background: var(--green-hover);
+    }
+</style>
+
+<div
+    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #E5E7EB;">
+    <div>
+        <h1 style="font-size: 28px; color: var(--navy);">Support Tickets</h1>
+        <p style="color: var(--text-light); margin-top: 5px;">Manage customer inquiries and resolve issues.</p>
+    </div>
+    <!-- Button to trigger Create Ticket Modal -->
+    <button onclick="document.getElementById('ticketModal').style.display='flex'"
+        style="background: var(--navy); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: background 0.3s; box-shadow: var(--shadow);"
+        onmouseover="this.style.background='var(--green)'" onmouseout="this.style.background='var(--navy)'">
+        <i class="fas fa-ticket-alt" style="margin-right: 8px;"></i> Create Ticket
+    </button>
+</div>
+
+<div style="background: white; border-radius: 12px; box-shadow: var(--shadow); overflow: hidden;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead style="background: #F9FAFB; border-bottom: 2px solid #E5E7EB;">
+            <tr>
+                <th style="padding: 16px 24px; color: var(--text-light); font-weight: 600; font-size: 14px;">Ticket ID
+                </th>
+                <th style="padding: 16px 24px; color: var(--text-light); font-weight: 600; font-size: 14px;">Subject
+                </th>
+                <th style="padding: 16px 24px; color: var(--text-light); font-weight: 600; font-size: 14px;">Status</th>
+                <th
+                    style="padding: 16px 24px; color: var(--text-light); font-weight: 600; font-size: 14px; text-align: right;">
+                    Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr style="border-bottom: 1px solid #E5E7EB; transition: background 0.2s;"
+                onmouseover="this.style.background='#F3F4F6'" onmouseout="this.style.background='transparent'">
+                <td style="padding: 16px 24px; font-weight: bold; color: var(--text-light);">#{{ ticket.id }}</td>
+                <td style="padding: 16px 24px; color: var(--navy); font-weight: 500;">{{ ticket.description }}</td>
+                <td style="padding: 16px 24px;">
+                    {% if ticket.status == 'Resolved' %}
+                    <span
+                        style="background: rgba(16, 185, 129, 0.1); color: var(--green); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">Resolved</span>
+                    {% else %}
+                    <span
+                        style="background: rgba(245, 158, 11, 0.1); color: #F59E0B; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">Open</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 16px 24px; text-align: right;">
+                    <a href="mailto:{{ ticket.email }}"
+                        style="background: var(--green); color: white; padding: 8px 16px; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: bold; transition: all 0.2s ease; display: inline-block; box-shadow: 0 2px 4px rgba(16,185,129,0.2);"
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(16,185,129,0.3)'"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(16,185,129,0.2)'">
+                        <i class="fas fa-reply" style="margin-right: 5px;"></i> Reply
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" style="padding: 40px; text-align: center; color: var(--text-light); font-size: 15px;">
+                    <i class="fas fa-inbox"
+                        style="font-size: 30px; margin-bottom: 10px; color: #D1D5DB; display: block;"></i>
+                    No support tickets found.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Create Ticket Pop-up Modal -->
+<div id="ticketModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Create Support Ticket</h2>
+            <button class="close-btn" onclick="document.getElementById('ticketModal').style.display='none'"><i
+                    class="fas fa-times"></i></button>
+        </div>
+        <form action="/add_ticket" method="POST">
+            <div class="form-group">
+                <label>Issue Subject</label>
+                <input type="text" name="description" placeholder="e.g. Cannot reset password" required>
+            </div>
+            <div class="form-group">
+                <label>Customer Email</label>
+                <input type="email" name="email" placeholder="customer@example.com" required>
+            </div>
+            <button type="submit" class="submit-btn">Create Ticket</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Close modal if clicked outside
+    window.onclick = function (event) {
+        var modal = document.getElementById('ticketModal');
+        if (event.target == modal) { modal.style.display = "none"; }
+    }
+</script>
+{% endblock %}
